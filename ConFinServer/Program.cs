@@ -33,7 +33,6 @@ namespace ConFinServer
 
             app.UseAuthorization();
 
-
             app.MapControllers();
 
             app.Run();

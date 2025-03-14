@@ -1,4 +1,5 @@
-﻿using ConFinServer.Model;
+﻿using ConFinServer.Data;
+using ConFinServer.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,55 +9,76 @@ namespace ConFinServer.Controllers
     [ApiController]
     public class EstadoController : ControllerBase
     {
-        private static List<Estado> lista = new List<Estado>();
+        //private static List<Estado> lista = new List<Estado>();
+        private readonly AppDbContext _context;
 
-        [HttpGet]
-        public string Estado()
+        public EstadoController(AppDbContext context)
         {
-            var valor = "Teste";
-            return valor;
-        }
-
-        [HttpGet("Estado2")]
-
-        public string Estado(string valor)
-        {
-            //var valor = "Teste";
-            return valor;
+            _context = context;
         }
 
         [HttpGet]
-        [Route("Lista")]
-        public List<Estado> EstadoLista()
+        public List<Estado> GetEstado()
         {
+            var lista = _context.Estado.ToList();
             return lista;
         }
 
-        [HttpPost]
-        public string PostEstado(Estado estado)
-        {
-            lista.Add(estado);
-            return "Estado adicionado com sucesso!";
-        }
+        /* [HttpGet("Estado2")]
+         public string Estado(string valor)
+         {
+             //var valor = "Teste";
+             return valor;
+         }
 
-        [HttpPut]
-        public string PutEstado(Estado estado)
+         [HttpGet]
+         [Route("Lista")]
+         public List<Estado> EstadoLista()
+         {
+             return lista;
+         } */
+
+        [HttpPost]
+        public IActionResult PostEstado([FromBody] Estado estado)
         {
-            var estadoExiste = lista
+            try
+            {
+                _context.Estado.Add(estado);
+                _context.SaveChanges();
+                return Ok("Estado adicionado com sucesso!");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Erro ao incluir estado. " + ex.Message);
+            }
+        }
+        [HttpPut]
+        public IActionResult PutEstado([FromBody] Estado estado)
+        {
+            var estadoExiste = _context.Estado
                                 .Where(l => l.Sigla == estado.Sigla)
                                 .FirstOrDefault();
             if (estadoExiste != null)
             {
-                estadoExiste.Nome = estado.Nome;
-                return "Estado alterado com sucesso!";
+                try
+                {
+                    estadoExiste.Nome = estado.Nome;
+                    _context.Estado.Update(estadoExiste);
+                    _context.SaveChanges();
+                    return Ok("Estado alterado com sucesso!");
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest("Erro ao alterar estado. " + ex.Message);
+                }
             }
             else
             {
-                return "Estado não encontrado!";
+                return NotFound("Estado não encontrado!");
             }
         }
 
-        [HttpDelete]
+        /*[HttpDelete]
         public string DeleteEstado(Estado estado)
         {
             var estadoExiste = lista
@@ -105,22 +127,31 @@ namespace ConFinServer.Controllers
             {
                 return "Estado não encontrado!";
             }
-        }
+        }*/
 
         [HttpDelete("{sigla}")]
-        public string DeleteEstado4([FromRoute] string sigla)
+        public IActionResult DeleteEstado([FromRoute] string sigla)
         {
-            var estadoExiste = lista
+            var estadoExiste = _context.Estado
                                 .Where(l => l.Sigla == sigla)
                                 .FirstOrDefault();
             if (estadoExiste != null)
             {
-                lista.Remove(estadoExiste);
-                return "Estado removido com sucesso!";
+                try
+                {
+                    _context.Estado.Remove(estadoExiste);
+                    _context.SaveChanges();
+                    return Ok("Estado removido com sucesso!");
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest("Erro ao remover estado. " + ex.Message);
+                }
+
             }
             else
             {
-                return "Estado não encontrado!";
+                return NotFound("Estado não encontrado!");
             }
         }
     }
