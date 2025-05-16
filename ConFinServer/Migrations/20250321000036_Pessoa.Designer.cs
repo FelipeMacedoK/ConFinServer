@@ -3,6 +3,7 @@ using System;
 using ConFinServer.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ConFinServer.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250321000036_Pessoa")]
+    partial class Pessoa
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,44 +48,6 @@ namespace ConFinServer.Migrations
                     b.HasIndex("EstadoSigla");
 
                     b.ToTable("Cidade");
-                });
-
-            modelBuilder.Entity("ConFinServer.Model.Conta", b =>
-                {
-                    b.Property<int>("Numero")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Numero"));
-
-                    b.Property<int>("CodigoPessoa")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("Data")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Descricao")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<int?>("PessoaCodigo")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Situacao")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Tipo")
-                        .HasColumnType("integer");
-
-                    b.Property<decimal>("Valor")
-                        .HasColumnType("numeric");
-
-                    b.HasKey("Numero");
-
-                    b.HasIndex("PessoaCodigo");
-
-                    b.ToTable("Conta");
                 });
 
             modelBuilder.Entity("ConFinServer.Model.Estado", b =>
@@ -142,15 +107,6 @@ namespace ConFinServer.Migrations
                         .IsRequired();
 
                     b.Navigation("Estado");
-                });
-
-            modelBuilder.Entity("ConFinServer.Model.Conta", b =>
-                {
-                    b.HasOne("ConFinServer.Model.Pessoa", "Pessoa")
-                        .WithMany()
-                        .HasForeignKey("PessoaCodigo");
-
-                    b.Navigation("Pessoa");
                 });
 
             modelBuilder.Entity("ConFinServer.Model.Pessoa", b =>

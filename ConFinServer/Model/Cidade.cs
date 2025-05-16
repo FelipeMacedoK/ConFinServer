@@ -18,6 +18,8 @@ namespace ConFinServer.Model
                      , MinimumLength = 2
                      , ErrorMessage = "O estado deve ter 2 caracteres")]
         [ForeignKey("Estado")]
-        public string Estado { get; set; }
+        public string EstadoSigla { get; set; }
+
+        public Estado? Estado { get; set; }
     }
 }

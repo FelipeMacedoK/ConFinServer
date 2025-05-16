@@ -10,7 +10,17 @@ namespace ConFinServer
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            // Add services to the container
+            //Configuração de CORS
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+                });
+            });
 
             var conexao = builder.Configuration.GetConnectionString("Postgres");
             builder.Services.AddDbContext<AppDbContext>(b => b.UseNpgsql(conexao));
@@ -28,6 +38,8 @@ namespace ConFinServer
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            app.UseCors("CorsPolicy");
 
             app.UseHttpsRedirection();
 

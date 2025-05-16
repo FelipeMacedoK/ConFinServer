@@ -2,6 +2,7 @@
 using ConFinServer.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ConFinServer.Controllers
 {
@@ -18,10 +19,20 @@ namespace ConFinServer.Controllers
 
         [HttpGet]
         [Route("Lista")]
-        public List<Cidade> GetCidade()
+        public IActionResult GetCidade()
         {
-            var lista = _context.Cidade.ToList();
-            return lista;
+            try
+            {
+                var lista = _context.Cidade
+                            .Include(c => c.Estado)
+                            .OrderBy(c => c.Nome)
+                            .ToList();
+                return Ok(lista);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Erro ao consultar cidade . " + ex.Message);
+            }
         }
 
         [HttpPost]
@@ -51,6 +62,7 @@ namespace ConFinServer.Controllers
                 {
                     cidadeExiste.Nome = cidade.Nome;
                     cidadeExiste.Estado = cidade.Estado;
+                    _context.Cidade.Update(cidadeExiste);
                     _context.SaveChanges();
                     return Ok("Cidade alterada com sucesso!");
                 }
